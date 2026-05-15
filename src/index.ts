@@ -13,6 +13,7 @@ import { promises as fs } from "fs";
 import { homedir } from "os";
 import { join } from "path";
 import "dotenv/config";
+import { TEMPLATES } from "./templates.js";
 
 // ── Constants ───────────────────────────────────────────────────────────────
 
@@ -47,6 +48,15 @@ const GetHistorySchema = z.object({
 });
 
 const ReusePromptSchema = z.object({
+  id: z.string().min(1),
+});
+
+const GetTemplatesSchema = z.object({
+  type: z.enum(["chat", "agent", "system", "image", "all"]).default("all"),
+  category: z.string().optional(),
+});
+
+const UseTemplateSchema = z.object({
   id: z.string().min(1),
 });
 
@@ -208,6 +218,52 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         required: ["id"],
       },
     },
+    {
+      name: "get_templates",
+      description:
+        "Lists built-in starter prompt templates. Use when the user asks for prompt examples, wants a starting point, has no idea what to write, asks 'what can I do with this?', or wants to see templates for a specific type (chat, agent, system, image).",
+      annotations: {
+        title: "Get Starter Templates",
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
+      inputSchema: {
+        type: "object",
+        properties: {
+          type: {
+            type: "string",
+            enum: ["chat", "agent", "system", "image", "all"],
+            default: "all",
+            description: "Filter templates by prompt type",
+          },
+          category: {
+            type: "string",
+            description: "Filter templates by category keyword (case-insensitive)",
+          },
+        },
+      },
+    },
+    {
+      name: "use_template",
+      description:
+        "Returns the full text of a built-in starter template by ID and saves it to history. Use when the user picks a template they want to use.",
+      annotations: {
+        title: "Use Template",
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false,
+      },
+      inputSchema: {
+        type: "object",
+        properties: {
+          id: { type: "string", description: "The template ID from get_templates" },
+        },
+        required: ["id"],
+      },
+    },
   ],
 }));
 
@@ -340,6 +396,87 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 context_tip: entry.context_tip,
                 optimized_at: entry.timestamp,
               },
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+
+  // ── get_templates ──────────────────────────────────────────────────────────
+  if (name === "get_templates") {
+    const parsed = GetTemplatesSchema.safeParse(request.params.arguments);
+    if (!parsed.success) throw new Error(`Invalid arguments: ${parsed.error.message}`);
+    const { type, category } = parsed.data;
+
+    let filtered = type === "all" ? TEMPLATES : TEMPLATES.filter((t) => t.type === type);
+    if (category) {
+      const q = category.toLowerCase();
+      filtered = filtered.filter((t) => t.category.toLowerCase().includes(q));
+    }
+
+    // Return list view — omit full prompt text
+    const list = filtered.map(({ id, name, type, category, description, score, tags }) => ({
+      id,
+      name,
+      type,
+      category,
+      description,
+      score,
+      tags,
+    }));
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({ total: list.length, templates: list }, null, 2),
+        },
+      ],
+    };
+  }
+
+  // ── use_template ───────────────────────────────────────────────────────────
+  if (name === "use_template") {
+    const parsed = UseTemplateSchema.safeParse(request.params.arguments);
+    if (!parsed.success) throw new Error(`Invalid arguments: ${parsed.error.message}`);
+    const { id } = parsed.data;
+
+    const template = TEMPLATES.find((t) => t.id === id);
+    if (!template) {
+      return {
+        content: [{ type: "text", text: `No template found with id: ${id}` }],
+      };
+    }
+
+    // Save to history so the user can reuse it later
+    saveHistory({
+      id: randomUUID(),
+      timestamp: new Date().toISOString(),
+      type: template.type,
+      original_prompt: `[template] ${template.name}`,
+      original_score: template.score,
+      improved_prompt: template.prompt,
+      improved_score: template.score,
+      improvements: [`Used built-in template: ${template.name}`],
+      context_tip: `This is a starter template (${template.category}). Customize the placeholder values in [BRACKETS] before using.`,
+    });
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(
+            {
+              id: template.id,
+              name: template.name,
+              type: template.type,
+              category: template.category,
+              score: template.score,
+              prompt: template.prompt,
+              tip: "Replace all [PLACEHOLDER] values with your specifics before using.",
             },
             null,
             2

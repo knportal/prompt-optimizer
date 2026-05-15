@@ -31,6 +31,18 @@ what have I optimized recently?
 reuse the article summary one
 ```
 
+```
+show me starter templates
+```
+
+```
+show me agent templates
+```
+
+```
+use the code review one
+```
+
 See [examples.md](examples.md) for full end-to-end examples with expected outputs.
 
 ## Tools
@@ -40,6 +52,8 @@ See [examples.md](examples.md) for full end-to-end examples with expected output
 | `optimize_prompt` | Scores your prompt 1–10 and returns an improved version with explanations |
 | `get_history` | Browse and search previously optimized prompts |
 | `reuse_prompt` | Retrieve a specific improved prompt from history by ID |
+| `get_templates` | List built-in starter templates, filterable by type (chat, agent, system, image) |
+| `use_template` | Retrieve a full starter template by ID and save it to history |
 
 ## How it works
 

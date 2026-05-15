@@ -41,6 +41,14 @@
     {
       "name": "reuse_prompt",
       "description": "Retrieves a specific improved prompt from history by ID."
+    },
+    {
+      "name": "get_templates",
+      "description": "Lists built-in starter prompt templates, filterable by type and category."
+    },
+    {
+      "name": "use_template",
+      "description": "Returns the full text of a built-in starter template by ID and saves it to history."
     }
   ],
   "compatibility": {

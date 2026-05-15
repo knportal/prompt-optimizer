@@ -24,4 +24,15 @@ You have two MCP tools available from the Prompt Optimizer server:
 - Wants to grab the improved version of something they optimized before
 - Asks to go back to a prompt from earlier
 
+**get_templates** — use this when the user:
+- Asks for prompt examples or inspiration
+- Says "I don't know where to start" or "show me what I can do"
+- Wants a template for a specific type (chat, agent, system, image)
+- Asks "what kinds of prompts can I optimize?"
+
+**use_template** — use this when the user:
+- Picks a template from the list returned by get_templates
+- Says "use that one" or "give me the [template name] template"
+- Wants the full text of a specific template to customize
+
 Always offer to run these tools proactively. Don't wait to be asked explicitly.
