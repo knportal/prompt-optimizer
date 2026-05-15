@@ -1,7 +1,7 @@
 {
   "manifest_version": "0.4",
   "name": "Prompt Optimizer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Improve any AI prompt instantly. Paste a rough idea and get a scored, improved version with explanations — for chat, agents, system prompts, and image generation.",
   "homepage": "https://github.com/knportal/prompt-optimizer",
   "privacy_policies": ["https://raw.githubusercontent.com/knportal/prompt-optimizer/main/privacy-policy.md"],
