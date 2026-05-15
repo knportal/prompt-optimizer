@@ -1,0 +1,49 @@
+{
+  "manifest_version": "0.4",
+  "name": "Prompt Optimizer",
+  "version": "1.0.0",
+  "description": "Improve any AI prompt instantly. Paste a rough idea and get a scored, improved version with explanations — for chat, agents, system prompts, and image generation.",
+  "homepage": "https://github.com/knportal/prompt-optimizer",
+  "privacy_policies": ["https://raw.githubusercontent.com/knportal/prompt-optimizer/main/privacy-policy.md"],
+  "author": {
+    "name": "Kenneth Nygren"
+  },
+  "license": "MIT",
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"],
+      "env": {
+        "ANTHROPIC_API_KEY": "${user_config.ANTHROPIC_API_KEY}"
+      }
+    }
+  },
+  "user_config": {
+    "ANTHROPIC_API_KEY": {
+      "type": "string",
+      "title": "Anthropic API Key",
+      "description": "Your Anthropic API key from console.anthropic.com. Used to call Claude for prompt analysis.",
+      "required": true,
+      "sensitive": true
+    }
+  },
+  "tools": [
+    {
+      "name": "optimize_prompt",
+      "description": "Analyzes a rough AI prompt, scores it 1–10, and returns an improved version with explanations."
+    },
+    {
+      "name": "get_history",
+      "description": "Returns previously optimized prompts from local history, with optional type filter and keyword search."
+    },
+    {
+      "name": "reuse_prompt",
+      "description": "Retrieves a specific improved prompt from history by ID."
+    }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32"]
+  }
+}
