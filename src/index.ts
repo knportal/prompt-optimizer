@@ -144,6 +144,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       description:
         "Analyzes and improves an AI prompt. Use this when the user shares a prompt, asks for help writing one, wants to know if their prompt is good, or wants better results from an AI model. Scores the original 1–10, identifies issues, and returns a rated improved version.",
       annotations: {
+        title: "Optimize Prompt",
         readOnlyHint: false,
         destructiveHint: false,
         idempotentHint: false,
@@ -168,6 +169,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       description:
         "Returns previously optimized prompts from local history. Use when the user asks what prompts they've optimized before, wants to browse past results, or wants to find a prompt by topic.",
       annotations: {
+        title: "Get Prompt History",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
@@ -192,6 +194,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       description:
         "Retrieves a specific improved prompt from history by ID. Use when the user wants to reuse or copy a previously optimized prompt.",
       annotations: {
+        title: "Reuse Prompt",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
